@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Informe Nómina — Marzo 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--navy:#0d1f3c;--blue:#1a56db;--cyan:#0891b2;--green:#059669;--amber:#d97706;--red:#dc2626;--orange:#ea580c;--gray:#64748b;--light:#f1f5f9;--border:#e2e8f0;--white:#fff;--text:#1e293b;--muted:#94a3b8}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:#f8fafc;color:var(--text);font-size:14px;line-height:1.6}
+/* HEADER */
+.header{background:var(--navy);position:relative;overflow:hidden}
+.header::before{content:'';position:absolute;top:-60px;right:-80px;width:340px;height:340px;background:radial-gradient(circle,rgba(26,86,219,.35) 0%,transparent 70%);border-radius:50%}
+.header::after{content:'';position:absolute;bottom:-40px;left:20%;width:200px;height:200px;background:radial-gradient(circle,rgba(8,145,178,.2) 0%,transparent 70%);border-radius:50%}
+.header-inner{position:relative;z-index:1;max-width:1280px;margin:0 auto;padding:38px 40px 30px;display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.header-tag{display:inline-block;background:rgba(26,86,219,.25);border:1px solid rgba(37,99,235,.4);color:#93c5fd;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:4px 12px;border-radius:20px;margin-bottom:10px}
+.header h1{font-family:'Syne',sans-serif;font-size:clamp(24px,3.2vw,38px);font-weight:800;color:#fff;line-height:1.1;letter-spacing:-.02em}
+.header h1 span{color:#60a5fa}
+.header-sub{margin-top:6px;color:#94a3b8;font-size:12px;font-weight:300}
+.header-right{text-align:right}
+.header-date{font-family:'Syne',sans-serif;font-size:13px;font-weight:600;color:#60a5fa}
+.header-note{font-size:11px;color:#475569;margin-top:3px}
+/* NAV */
+.nav-bar{background:var(--navy);border-top:1px solid rgba(255,255,255,.07);position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.18)}
+.nav-inner{max-width:1280px;margin:0 auto;padding:0 40px;display:flex;overflow-x:auto}
+.nav-inner::-webkit-scrollbar{height:0}
+.nav-btn{background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:12.5px;font-weight:500;color:#64748b;padding:13px 16px;border-bottom:2.5px solid transparent;white-space:nowrap;transition:color .2s,border-color .2s}
+.nav-btn:hover{color:#cbd5e1}
+.nav-btn.active{color:#60a5fa;border-bottom-color:#60a5fa}
+/* LAYOUT */
+.main{max-width:1280px;margin:0 auto;padding:26px 40px 60px}
+.section{display:none}
+.section.active{display:block}
+.section-title{font-family:'Syne',sans-serif;font-size:19px;font-weight:700;color:var(--navy);margin-bottom:3px}
+.section-desc{font-size:12.5px;color:var(--gray);margin-bottom:18px;max-width:860px;line-height:1.55}
+/* FILTER BAR */
+.filter-bar{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:12px 18px;margin-bottom:20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.filter-label{font-size:12px;font-weight:600;color:var(--navy);white-space:nowrap}
+.filter-select-wrap{position:relative;flex:1;min-width:220px;max-width:400px}
+.filter-select{width:100%;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--text);background:var(--white);border:1px solid var(--border);border-radius:8px;padding:7px 32px 7px 10px;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Cpolyline points='6,9 12,15 18,9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;transition:border-color .2s}
+.filter-select:focus{border-color:var(--blue)}
+.filter-tags{display:flex;gap:6px;flex-wrap:wrap;flex:2}
+.filter-tag{display:inline-flex;align-items:center;gap:5px;background:#dbeafe;color:#1d4ed8;font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px;cursor:pointer;transition:background .15s}
+.filter-tag:hover{background:#bfdbfe}
+.filter-tag .remove{font-size:13px;line-height:1;color:#3b82f6}
+.filter-clear{font-size:11px;color:var(--gray);cursor:pointer;text-decoration:underline;white-space:nowrap}
+.filter-clear:hover{color:var(--red)}
+/* KPI */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:11px;margin-bottom:20px}
+.kpi-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:15px 17px 13px;position:relative;overflow:hidden;transition:transform .15s,box-shadow .15s}
+.kpi-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.07)}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--kc,var(--blue));border-radius:12px 12px 0 0}
+.kpi-label{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px}
+.kpi-value{font-family:'Syne',sans-serif;font-size:19px;font-weight:700;color:var(--kc,var(--navy));line-height:1.1}
+.kpi-sub{font-size:10.5px;color:var(--muted);margin-top:3px}
+/* CARDS */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px}
+@media(max-width:900px){.two-col{grid-template-columns:1fr}}
+.card{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:18px 20px}
+.card-title{font-family:'Syne',sans-serif;font-size:12.5px;font-weight:700;color:var(--navy);margin-bottom:13px;display:flex;align-items:center;gap:7px}
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+/* TABLE */
+.table-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead th{background:var(--navy);color:#fff;padding:9px 11px;text-align:left;font-family:'Syne',sans-serif;font-size:10px;font-weight:600;letter-spacing:.05em;white-space:nowrap}
+thead th.num{text-align:right}
+tbody tr{border-bottom:1px solid var(--border);transition:background .1s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:#f8fafc}
+tbody tr.admin-row{background:#fff7ed}
+tbody tr.admin-row:hover{background:#fff3e0}
+tbody tr.total-row{background:#eef2ff;font-weight:600}
+tbody tr.hidden-row{display:none}
+td{padding:7px 11px;color:var(--text);white-space:nowrap}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+td.pct-red{color:var(--red);font-weight:600}
+td.pct-amber{color:var(--amber);font-weight:600}
+td.pct-green{color:var(--green);font-weight:600}
+td.bold{font-weight:600;color:var(--navy)}
+.badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px}
+.badge-prod{background:#dbeafe;color:#1d4ed8}
+.badge-admin{background:#ffedd5;color:#c2410c}
+/* BARS */
+.bar-row{display:flex;align-items:center;gap:9px;margin-bottom:7px}
+.bar-label{font-size:11px;color:var(--text);width:185px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-track{flex:1;height:9px;background:var(--light);border-radius:6px;overflow:hidden}
+.bar-fill{height:100%;border-radius:6px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+.bar-val{font-size:11px;font-weight:600;color:var(--navy);width:78px;text-align:right;flex-shrink:0}
+/* SEMAFORO */
+.semaforo{display:flex;gap:16px;margin-bottom:13px;flex-wrap:wrap}
+.sem-item{display:flex;align-items:center;gap:6px;font-size:12px}
+.sem-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+/* CONCEPT */
+.concept-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-top:10px}
+@media(max-width:800px){.concept-grid{grid-template-columns:1fr}}
+.concept-group{background:var(--white);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.concept-header{padding:9px 13px;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:#fff}
+.concept-row{display:flex;justify-content:space-between;align-items:center;padding:6px 13px;border-bottom:1px solid var(--border);font-size:11.5px}
+.concept-row:last-child{border-bottom:none}
+.concept-name{color:var(--text);flex:1;padding-right:8px}
+.concept-val{font-weight:600;color:var(--navy);white-space:nowrap}
+.concept-pct{color:var(--muted);font-size:10.5px;margin-left:6px;min-width:32px;text-align:right}
+/* RESUMEN RESPONSIVE GRIDS */
+@media(max-width:1100px){
+  #kpi-r1{grid-template-columns:repeat(3,1fr) !important}
+  #kpi-r2{grid-template-columns:repeat(3,1fr) !important}
+  #kpi-r3{grid-template-columns:repeat(3,1fr) !important}
+  #tab-resumen .three-graf{grid-template-columns:1fr 1fr !important}
+}
+@media(max-width:700px){
+  #kpi-r1,#kpi-r2,#kpi-r3{grid-template-columns:repeat(2,1fr) !important}
+  #tab-resumen .three-graf{grid-template-columns:1fr !important}
+}
+/* FOOTER */
+.footer{background:var(--navy);padding:16px 40px;margin-top:40px;text-align:center}
+.footer p{font-size:11px;color:#475569}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.section.active .card,.section.active .kpi-card,.section.active .table-wrap{animation:fadeIn .22s ease both}
+</style>
+</head>
+<body>
+<header class="header">
+  <div class="header-inner">
+    <div class="header-left">
+      <div class="header-tag">Informe Gerencial</div>
+      <h1>Nómina <span>Marzo 2026</span></h1>
+      <p class="header-sub">Análisis de costos empresa · Producción · Eficiencia por proyecto</p>
+    </div>
+    <div class="header-right">
+      <div class="header-date">Período: Marzo 2026</div>
+      <div class="header-note">Costo empresa (devengos brutos) · No incluye descuentos al trabajador</div>
+    </div>
+  </div>
+</header>
+<nav class="nav-bar">
+  <div class="nav-inner">
+    <button class="nav-btn active" onclick="showTab('resumen',this)">Resumen Ejecutivo</button>
+    <button class="nav-btn" onclick="showTab('costos',this)">Costos por Proyecto</button>
+    <button class="nav-btn" onclick="showTab('produccion',this)">Nómina vs Producción</button>
+    <button class="nav-btn" onclick="showTab('modmoi',this)">MOD / MOI</button>
+    <button class="nav-btn" onclick="showTab('extras',this)">Horas Extras</button>
+    <button class="nav-btn" onclick="showTab('conceptos',this)">Composición</button>
+  </div>
+</nav>
+<main class="main">
+
+<!-- ══ RESUMEN ══ -->
+<div class="section active" id="tab-resumen">
+
+  <!-- BLOQUE 1: Producción + Contratos + Proyectos + Nómina + Empleados -->
+  <div style="margin-bottom:18px">
+    <div style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;padding-left:2px">Contexto del Mes</div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:11px" id="kpi-r1"></div>
+  </div>
+
+  <!-- DIVIDER -->
+  <div style="border-top:1px dashed var(--border);margin:4px 0 18px"></div>
+
+  <!-- BLOQUE 2: MOD / MOI — destacado con fondo -->
+  <div style="margin-bottom:18px">
+    <div style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;padding-left:2px">Mano de Obra</div>
+    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:11px" id="kpi-r2"></div>
+  </div>
+
+  <!-- DIVIDER -->
+  <div style="border-top:1px dashed var(--border);margin:4px 0 18px"></div>
+
+  <!-- BLOQUE 3: Composición de la nómina -->
+  <div style="margin-bottom:18px">
+    <div style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;padding-left:2px">Composición del Costo Nómina</div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:11px" id="kpi-r3"></div>
+  </div>
+
+  <!-- DIVIDER -->
+  <div style="border-top:1px dashed var(--border);margin:4px 0 18px"></div>
+
+  <!-- BLOQUE 4: Gráficas + Barras -->
+  <div class="three-graf" style="display:grid;grid-template-columns:1fr 1fr 1.6fr;gap:16px;margin-bottom:0">
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--blue)"></span>Composición Nómina</div>
+      <div style="height:210px"><canvas id="ch-res-comp"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--cyan)"></span>MOD vs MOI</div>
+      <div style="height:210px"><canvas id="ch-res-modmoi"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--navy)"></span>Costo Nómina por Proyecto (Top 15)</div>
+      <div id="bars-resumen"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ COSTOS ══ -->
+<div class="section" id="tab-costos">
+  <p class="section-title">Costos de Nómina por Proyecto</p>
+  <p class="section-desc">Costo empresa por proyecto. <span style="color:var(--orange);font-weight:600">Naranja</span> = centros sin producción (Oficina Principal, Ejecutiva, Personal de la Casa).</p>
+  <div class="filter-bar" id="fb-costos">
+    <span class="filter-label">Filtrar proyectos:</span>
+    <div class="filter-select-wrap"><select class="filter-select" id="fs-costos" onchange="addFilter('costos',this)"><option value="">— Seleccionar proyecto —</option></select></div>
+    <div class="filter-tags" id="ft-costos"></div>
+    <span class="filter-clear" onclick="clearFilter('costos')">Limpiar</span>
+  </div>
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--blue)"></span>Costo Total por Proyecto</div>
+      <div style="height:460px"><canvas id="ch-costo-bar"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--green)"></span>Composición por Categoría (Top 12)</div>
+      <div style="height:460px"><canvas id="ch-stacked"></canvas></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title"><span class="dot" style="background:var(--navy)"></span>Tabla Detallada</div>
+    <div class="table-wrap">
+      <table><thead><tr>
+        <th>Proyecto</th><th class="num">Empl.</th><th class="num">Costo Total</th>
+        <th class="num">Sueldo</th><th class="num">H. Extras</th><th class="num">Aux/Subs</th>
+        <th class="num">Vac + Lic</th><th class="num">% Total</th><th>Tipo</th>
+      </tr></thead><tbody id="tbody-costos"></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PRODUCCION ══ -->
+<div class="section" id="tab-produccion">
+  <p class="section-title">Nómina vs Producción y Costos de Contrato</p>
+  <p class="section-desc"><strong>% Nom/Prod</strong>: peso de la nómina sobre producción certificada. <strong>% Nom/Costo</strong>: peso sobre el costo del contrato. Ambos con semáforo.</p>
+  <div class="filter-bar">
+    <span class="filter-label">Filtrar proyectos:</span>
+    <div class="filter-select-wrap"><select class="filter-select" id="fs-prod" onchange="addFilter('prod',this)"><option value="">— Seleccionar proyecto —</option></select></div>
+    <div class="filter-tags" id="ft-prod"></div>
+    <span class="filter-clear" onclick="clearFilter('prod')">Limpiar</span>
+  </div>
+  <div class="semaforo">
+    <div class="sem-item"><div class="sem-dot" style="background:var(--green)"></div><span><strong style="color:var(--green)">&lt;20%</strong> Eficiente</span></div>
+    <div class="sem-item"><div class="sem-dot" style="background:var(--amber)"></div><span><strong style="color:var(--amber)">20–35%</strong> Moderado</span></div>
+    <div class="sem-item"><div class="sem-dot" style="background:var(--red)"></div><span><strong style="color:var(--red)">&gt;35%</strong> Requiere revisión</span></div>
+  </div>
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-title"><span class="dot" style="background:var(--amber)"></span>% Nómina / Producción por Proyecto</div>
+    <div style="height:430px"><canvas id="ch-pct-prod"></canvas></div>
+  </div>
+  <div class="card">
+    <div class="card-title"><span class="dot" style="background:var(--navy)"></span>Tabla: Producción · %Nom/Prod · Costos Contrato · %Nom/Costo · Costo Nómina</div>
+    <div class="table-wrap">
+      <table><thead><tr>
+        <th>Proyecto</th><th class="num">Empl.</th>
+        <th class="num">Producción</th><th class="num">% Nom/Prod</th>
+        <th class="num">Costos Contrato</th><th class="num">% Nom/Costo</th>
+        <th class="num">Costo Nómina</th>
+      </tr></thead><tbody id="tbody-prod"></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MOD / MOI ══ -->
+<div class="section" id="tab-modmoi">
+  <p class="section-title">Mano de Obra Directa vs Indirecta</p>
+  <p class="section-desc"><strong>MOD</strong>: campo / actividades productivas. <strong>MOI</strong>: supervisión, ingeniería, HSE, administración de obra. Salario promedio sobre sueldo básico.</p>
+  <div class="filter-bar">
+    <span class="filter-label">Filtrar proyectos:</span>
+    <div class="filter-select-wrap"><select class="filter-select" id="fs-modmoi" onchange="addFilter('modmoi',this)"><option value="">— Seleccionar proyecto —</option></select></div>
+    <div class="filter-tags" id="ft-modmoi"></div>
+    <span class="filter-clear" onclick="clearFilter('modmoi')">Limpiar</span>
+  </div>
+  <div class="kpi-grid" id="kpi-modmoi"></div>
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--blue)"></span>Distribución MOD / MOI — Costo</div>
+      <div style="height:260px"><canvas id="ch-mod-donut"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--cyan)"></span>MOD vs MOI por Proyecto</div>
+      <div style="height:260px"><canvas id="ch-mod-stacked"></canvas></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title"><span class="dot" style="background:var(--navy)"></span>Detalle MOD / MOI con Salario Promedio</div>
+    <div class="table-wrap">
+      <table><thead><tr>
+        <th>Proyecto</th><th class="num">Empl.</th>
+        <th class="num">Costo MOD</th><th class="num">Pers.MOD</th><th class="num">Sal.Prom.MOD</th><th class="num">%MOD</th>
+        <th class="num">Costo MOI</th><th class="num">Pers.MOI</th><th class="num">Sal.Prom.MOI</th><th class="num">%MOI</th>
+      </tr></thead><tbody id="tbody-modmoi"></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- ══ HORAS EXTRAS ══ -->
+<div class="section" id="tab-extras">
+  <p class="section-title">Impacto de Horas Extras y Recargos</p>
+  <p class="section-desc">H.E. diurnas/nocturnas, dominicales/festivas y recargos nocturnos. Costo adicional al salario ordinario.</p>
+  <div class="filter-bar">
+    <span class="filter-label">Filtrar proyectos:</span>
+    <div class="filter-select-wrap"><select class="filter-select" id="fs-extras" onchange="addFilter('extras',this)"><option value="">— Seleccionar proyecto —</option></select></div>
+    <div class="filter-tags" id="ft-extras"></div>
+    <span class="filter-clear" onclick="clearFilter('extras')">Limpiar</span>
+  </div>
+  <div class="kpi-grid" id="kpi-extras"></div>
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--red)"></span>Top Proyectos — Horas Extras</div>
+      <div style="height:380px"><canvas id="ch-ext-bar"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--orange)"></span>Por Tipo de Recargo</div>
+      <div style="height:380px"><canvas id="ch-ext-tipo"></canvas></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title"><span class="dot" style="background:var(--navy)"></span>Tabla de Horas Extras</div>
+    <div class="table-wrap">
+      <table><thead><tr>
+        <th>Proyecto</th><th class="num">Empl.</th><th class="num">Costo Total</th>
+        <th class="num">H.Extras + Recargos</th><th class="num">% s/ Nómina</th>
+      </tr></thead><tbody id="tbody-extras"></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- ══ COMPOSICION ══ -->
+<div class="section" id="tab-conceptos">
+  <p class="section-title">Composición del Costo</p>
+  <p class="section-desc">Todos los conceptos de nómina por categoría. Filtre para ver el detalle de uno o varios proyectos.</p>
+  <div class="filter-bar">
+    <span class="filter-label">Filtrar proyectos:</span>
+    <div class="filter-select-wrap"><select class="filter-select" id="fs-comp" onchange="addFilter('comp',this)"><option value="">— Seleccionar proyecto —</option></select></div>
+    <div class="filter-tags" id="ft-comp"></div>
+    <span class="filter-clear" onclick="clearFilter('comp')">Limpiar</span>
+  </div>
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--blue)"></span>Distribución por Categoría</div>
+      <div style="height:265px"><canvas id="ch-cat-pie"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--navy)"></span>Resumen por Categoría</div>
+      <div id="cat-summary"></div>
+    </div>
+  </div>
+  <p style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--navy);margin:4px 0 10px">Detalle por Concepto</p>
+  <div class="concept-grid" id="concept-grid"></div>
+</div>
+
+</main>
+<footer class="footer">
+  <p>Informe Nómina Marzo 2026 · Costo empresa (devengos brutos) · No incluye descuentos ni retenciones ni factor prestacional · Empleados únicos: 1.966 · Fuente: Nómina_Marzo.xlsx</p>
+</footer>
+<script>
+const DATA = {"globals": {"total_costo": 9496150012.0, "total_emp": 1966, "n_prod": 27, "total_prod": 33898883000.0, "total_costos_contrato": 32841517400.0, "total_extras": 890396222.0, "total_sueldo": 5861825007.0, "total_aux": 2245482993.0, "total_vac": 68144422.0, "total_lic": 430283859.0, "total_mod": 4988741785.0, "total_moi": 4507408227.0, "admin_costo": 1126129213.0, "n_proyectos": 30, "sal_prom_mod_global": 2063732.4268960126, "sal_prom_moi_global": 4642354.882438316, "pers_mod_global": 1279, "pers_moi_global": 689}, "proyectos": [{"Proyecto": "0447 GEB LT RSO", "costo_total": 1739909627, "Auxilios y Subsidios": 542291399, "Horas Extras": 117568030, "Licencias/Permisos": 92709205, "Otros": 0, "Sueldo": 981807659, "Vacaciones": 5533334, "costo_MOD": 1145851253, "costo_MOI": 594058374, "sueldo_mod": 605068673.0, "pers_mod": 307, "sueldo_moi": 376738986, "pers_moi": 105, "produccion": 7139000000.0, "costos_contrato": 7045000000.0, "empleados": 417, "tipo": "productivo", "sal_promedio": 4172445.1486810553, "sal_prom_mod": 1970907.7296416939, "sal_prom_moi": 3587990.342857143, "pct_nom_prod": 0.24371895601624877, "pct_nom_costo": 0.24697084840312278}, {"Proyecto": "0411 GEB  LT COLECTORA  CUSTECITAS TRAMO 1", "costo_total": 1391802871, "Auxilios y Subsidios": 370774741, "Horas Extras": 186709396, "Licencias/Permisos": 42912598, "Otros": 0, "Sueldo": 760008083, "Vacaciones": 31398053, "costo_MOD": 1001370563, "costo_MOI": 390432308, "sueldo_mod": 522858286.0, "pers_mod": 223, "sueldo_moi": 235502515, "pers_moi": 64, "produccion": 2405000000.0, "costos_contrato": 3498000000.0, "empleados": 287, "tipo": "productivo", "sal_promedio": 4849487.355400697, "sal_prom_mod": 2344655.99103139, "sal_prom_moi": 3679726.796875, "pct_nom_prod": 0.5787122124740125, "pct_nom_costo": 0.3978853261863922}, {"Proyecto": "0001 OFICINA PRINCIPAL", "costo_total": 1033369122, "Auxilios y Subsidios": 141295700, "Horas Extras": 378182, "Licencias/Permisos": 4735191, "Otros": 0, "Sueldo": 863164839, "Vacaciones": 23795210, "costo_MOD": 0, "costo_MOI": 1033369122, "sueldo_mod": 0.0, "pers_mod": 0, "sueldo_moi": 862664839, "pers_moi": 151, "produccion": 0.0, "costos_contrato": 0.0, "empleados": 152, "tipo": "admin", "sal_promedio": 6798481.065789473, "sal_prom_mod": 0.0, "sal_prom_moi": 5713012.178807947, "pct_nom_prod": null, "pct_nom_costo": null}, {"Proyecto": "0428 ITUANGO CW 16863", "costo_total": 887441050, "Auxilios y Subsidios": 47583519, "Horas Extras": 240191735, "Licencias/Permisos": 119572479, "Otros": 0, "Sueldo": 480093317, "Vacaciones": 0, "costo_MOD": 624529311, "costo_MOI": 262911739, "sueldo_mod": 315481955.0, "pers_mod": 96, "sueldo_moi": 164611362, "pers_moi": 38, "produccion": 2826000000.0, "costos_contrato": 2329000000.0, "empleados": 134, "tipo": "productivo", "sal_promedio": 6622694.402985075, "sal_prom_mod": 3286270.3645833335, "sal_prom_moi": 4331877.947368421, "pct_nom_prod": 0.31402726468506725, "pct_nom_costo": 0.3810395234006011}, {"Proyecto": "0440 GEB NUEVA S/E HUILA 230 KV", "costo_total": 482691071, "Auxilios y Subsidios": 122512187, "Horas Extras": 69249776, "Licencias/Permisos": 16053920, "Otros": 0, "Sueldo": 274458521, "Vacaciones": 416667, "costo_MOD": 271169103, "costo_MOI": 211521968, "sueldo_mod": 129589378.0, "pers_mod": 61, "sueldo_moi": 144869143, "pers_moi": 32, "produccion": 2628000000.0, "costos_contrato": 2468000000.0, "empleados": 122, "tipo": "productivo", "sal_promedio": 3956484.1885245903, "sal_prom_mod": 2124416.0327868853, "sal_prom_moi": 4527160.71875, "pct_nom_prod": 0.18367240144596653, "pct_nom_costo": 0.19557985048622367}, {"Proyecto": "0456 GEB BOLÍVAR", "costo_total": 479988603, "Auxilios y Subsidios": 141665438, "Horas Extras": 43764353, "Licencias/Permisos": 7646691, "Otros": 17509, "Sueldo": 286894612, "Vacaciones": 0, "costo_MOD": 333519010, "costo_MOI": 146469593, "sueldo_mod": 166183790.0, "pers_mod": 98, "sueldo_moi": 99598479, "pers_moi": 24, "produccion": 3128000000.0, "costos_contrato": 2889000000.0, "empleados": 93, "tipo": "productivo", "sal_promedio": 5161167.774193549, "sal_prom_mod": 1695752.9591836734, "sal_prom_moi": 4149936.625, "pct_nom_prod": 0.15344904187979538, "pct_nom_costo": 0.1661435109034268}, {"Proyecto": "0426 CELSIA LT ESCOBAL", "costo_total": 368578918, "Auxilios y Subsidios": 111355496, "Horas Extras": 40507290, "Licencias/Permisos": 6097057, "Otros": 0, "Sueldo": 210005742, "Vacaciones": 613333, "costo_MOD": 241802381, "costo_MOI": 126776537, "sueldo_mod": 121142597.0, "pers_mod": 55, "sueldo_moi": 88829812, "pers_moi": 26, "produccion": 1533000000.0, "costos_contrato": 1279000000.0, "empleados": 81, "tipo": "productivo", "sal_promedio": 4550357.012345679, "sal_prom_mod": 2202592.672727273, "sal_prom_moi": 3416531.230769231, "pct_nom_prod": 0.24042982257012394, "pct_nom_costo": 0.2881774182955434}, {"Proyecto": "0457 SE ATLAS CAMPANO", "costo_total": 308983560, "Auxilios y Subsidios": 75254762, "Horas Extras": 3944963, "Licencias/Permisos": 19538424, "Otros": 0, "Sueldo": 210245411, "Vacaciones": 0, "costo_MOD": 57823822, "costo_MOI": 251159738, "sueldo_mod": 42374507.0, "pers_mod": 28, "sueldo_moi": 167870904, "pers_moi": 33, "produccion": 1067365600.0, "costos_contrato": 808523400.0, "empleados": 60, "tipo": "productivo", "sal_promedio": 5149726.0, "sal_prom_mod": 1513375.25, "sal_prom_moi": 5086997.090909091, "pct_nom_prod": 0.28948240415467763, "pct_nom_costo": 0.3821578447822289}, {"Proyecto": "0446 ISA LA MESA", "costo_total": 301076080, "Auxilios y Subsidios": 74525339, "Horas Extras": 40392600, "Licencias/Permisos": 11309205, "Otros": 0, "Sueldo": 174848936, "Vacaciones": 0, "costo_MOD": 171513220, "costo_MOI": 129562860, "sueldo_mod": 86113789.0, "pers_mod": 36, "sueldo_moi": 88735147, "pers_moi": 18, "produccion": 1598961400.0, "costos_contrato": 1292817200.0, "empleados": 54, "tipo": "productivo", "sal_promedio": 5575482.962962963, "sal_prom_mod": 2392049.6944444445, "sal_prom_moi": 4929730.388888889, "pct_nom_prod": 0.1882947768470208, "pct_nom_costo": 0.23288372091584178}, {"Proyecto": "0451 ENEL NV ESPERANZA", "costo_total": 278267259, "Auxilios y Subsidios": 77143386, "Horas Extras": 21145087, "Licencias/Permisos": 10812456, "Otros": 0, "Sueldo": 169166330, "Vacaciones": 0, "costo_MOD": 142851956, "costo_MOI": 135415303, "sueldo_mod": 69696330.0, "pers_mod": 41, "sueldo_moi": 99470000, "pers_moi": 20, "produccion": 1553000000.0, "costos_contrato": 1446000000.0, "empleados": 56, "tipo": "productivo", "sal_promedio": 4969058.196428572, "sal_prom_mod": 1699910.487804878, "sal_prom_moi": 4973500.0, "pct_nom_prod": 0.17918046297488732, "pct_nom_costo": 0.1924393215767635}, {"Proyecto": "0453 LT SAAP", "costo_total": 275634869, "Auxilios y Subsidios": 74582010, "Horas Extras": 18498604, "Licencias/Permisos": 25946851, "Otros": 0, "Sueldo": 156107404, "Vacaciones": 500000, "costo_MOD": 140286238, "costo_MOI": 135348631, "sueldo_mod": 67427595.0, "pers_mod": 42, "sueldo_moi": 88679809, "pers_moi": 24, "produccion": 1524200000.0, "costos_contrato": 1845624200.0, "empleados": 61, "tipo": "productivo", "sal_promedio": 4518604.409836066, "sal_prom_mod": 1605418.9285714286, "sal_prom_moi": 3694992.0416666665, "pct_nom_prod": 0.1808390427765385, "pct_nom_costo": 0.14934506656338814}, {"Proyecto": "0452 LT CARRIELES", "costo_total": 273233297, "Auxilios y Subsidios": 79128687, "Horas Extras": 36367796, "Licencias/Permisos": 7373498, "Otros": 0, "Sueldo": 150363316, "Vacaciones": 0, "costo_MOD": 201753525, "costo_MOI": 71479772, "sueldo_mod": 109237863.0, "pers_mod": 42, "sueldo_moi": 41125453, "pers_moi": 13, "produccion": 619000000.0, "costos_contrato": 697000000.0, "empleados": 67, "tipo": "productivo", "sal_promedio": 4078108.9104477614, "sal_prom_mod": 2600901.5, "sal_prom_moi": 3163496.3846153845, "pct_nom_prod": 0.44141081906300483, "pct_nom_costo": 0.3920133385939742}, {"Proyecto": "0309 LINEAS SOGAMOSO 500KV TRAMO 2", "costo_total": 234943702, "Auxilios y Subsidios": 55914979, "Horas Extras": 2101373, "Licencias/Permisos": 16685257, "Otros": 0, "Sueldo": 160242093, "Vacaciones": 0, "costo_MOD": 102102838, "costo_MOI": 132840864, "sueldo_mod": 73194519.0, "pers_mod": 43, "sueldo_moi": 86860907, "pers_moi": 17, "produccion": 350000000.0, "costos_contrato": 507000000.0, "empleados": 66, "tipo": "productivo", "sal_promedio": 3559753.0606060605, "sal_prom_mod": 1702198.1162790698, "sal_prom_moi": 5109465.117647059, "pct_nom_prod": 0.67126772, "pct_nom_costo": 0.4633998067061144}, {"Proyecto": "0458 EPM NV ESPERANZA", "costo_total": 234535688, "Auxilios y Subsidios": 62498117, "Horas Extras": 27607996, "Licencias/Permisos": 870262, "Otros": 0, "Sueldo": 143559313, "Vacaciones": 0, "costo_MOD": 178729078, "costo_MOI": 55806610, "sueldo_mod": 102122289.0, "pers_mod": 54, "sueldo_moi": 41437024, "pers_moi": 12, "produccion": 1230000000.0, "costos_contrato": 1098000000.0, "empleados": 60, "tipo": "productivo", "sal_promedio": 3908928.1333333333, "sal_prom_mod": 1891153.5, "sal_prom_moi": 3453085.3333333335, "pct_nom_prod": 0.19067942113821137, "pct_nom_costo": 0.21360263023679418}, {"Proyecto": "0370 ISA CARRIELES", "costo_total": 223009329, "Auxilios y Subsidios": 56497010, "Horas Extras": 29040007, "Licencias/Permisos": 3563764, "Otros": 0, "Sueldo": 133908548, "Vacaciones": 0, "costo_MOD": 145312409, "costo_MOI": 77696920, "sueldo_mod": 80355034.0, "pers_mod": 54, "sueldo_moi": 53304420, "pers_moi": 13, "produccion": 2015255800.0, "costos_contrato": 1521364200.0, "empleados": 67, "tipo": "productivo", "sal_promedio": 3328497.447761194, "sal_prom_mod": 1488056.1851851852, "sal_prom_moi": 4100340.0, "pct_nom_prod": 0.11066055683849167, "pct_nom_costo": 0.14658510368523198}, {"Proyecto": "0455 ENEL INTEXZONA", "costo_total": 187545054, "Auxilios y Subsidios": 45066886, "Horas Extras": 307636, "Licencias/Permisos": 0, "Otros": 0, "Sueldo": 142170532, "Vacaciones": 0, "costo_MOD": 24321656, "costo_MOI": 163223398, "sueldo_mod": 15902537.0, "pers_mod": 11, "sueldo_moi": 126267995, "pers_moi": 18, "produccion": 223000000.0, "costos_contrato": 505000000.0, "empleados": 29, "tipo": "productivo", "sal_promedio": 6467070.827586207, "sal_prom_mod": 1445685.1818181819, "sal_prom_moi": 7014888.611111111, "pct_nom_prod": 0.8410092107623318, "pct_nom_costo": 0.37137634455445545}, {"Proyecto": "0454 ISA AMPL SAN MARCOS 500 KV", "costo_total": 173175110, "Auxilios y Subsidios": 45824323, "Horas Extras": 8483848, "Licencias/Permisos": 3426660, "Otros": 0, "Sueldo": 115440279, "Vacaciones": 0, "costo_MOD": 75245356, "costo_MOI": 97929754, "sueldo_mod": 43847072.0, "pers_mod": 24, "sueldo_moi": 71593207, "pers_moi": 16, "produccion": 1587100200.0, "costos_contrato": 1543188400.0, "empleados": 39, "tipo": "productivo", "sal_promedio": 4440387.435897436, "sal_prom_mod": 1826961.3333333333, "sal_prom_moi": 4474575.4375, "pct_nom_prod": 0.10911416305032284, "pct_nom_costo": 0.1122190330098386}, {"Proyecto": "0414 GEB LT.NORTE FASE 3.", "costo_total": 123225161, "Auxilios y Subsidios": 32541306, "Horas Extras": 838055, "Licencias/Permisos": 662508, "Otros": 0, "Sueldo": 89183292, "Vacaciones": 0, "costo_MOD": 20503125, "costo_MOI": 102722036, "sueldo_mod": 11738292.0, "pers_mod": 12, "sueldo_moi": 77445000, "pers_moi": 22, "produccion": 169000000.0, "costos_contrato": 364000000.0, "empleados": 34, "tipo": "productivo", "sal_promedio": 3624269.4411764704, "sal_prom_mod": 978191.0, "sal_prom_moi": 3520227.272727273, "pct_nom_prod": 0.7291429644970414, "pct_nom_costo": 0.3385306620879121}, {"Proyecto": "0308 LINEAS SOGAMOSO 500KV TRAMO 1", "costo_total": 114814312, "Auxilios y Subsidios": 20858869, "Horas Extras": 0, "Licencias/Permisos": 4130001, "Otros": 0, "Sueldo": 89825442, "Vacaciones": 0, "costo_MOD": 14227641, "costo_MOI": 100586671, "sueldo_mod": 10121262.0, "pers_mod": 9, "sueldo_moi": 79704180, "pers_moi": 9, "produccion": 205000000.0, "costos_contrato": 182000000.0, "empleados": 18, "tipo": "productivo", "sal_promedio": 6378572.888888889, "sal_prom_mod": 1124584.6666666667, "sal_prom_moi": 8856020.0, "pct_nom_prod": 0.5600698146341463, "pct_nom_costo": 0.6308478681318681}, {"Proyecto": "0431 ISA DIAMETRO 5 SABANALARGA", "costo_total": 66206821, "Auxilios y Subsidios": 12093297, "Horas Extras": 758126, "Licencias/Permisos": 11766667, "Otros": 0, "Sueldo": 36100906, "Vacaciones": 5487825, "costo_MOD": 17012733, "costo_MOI": 49194088, "sueldo_mod": 8017573.0, "pers_mod": 6, "sueldo_moi": 28083333, "pers_moi": 7, "produccion": 1145000000.0, "costos_contrato": 779000000.0, "empleados": 14, "tipo": "productivo", "sal_promedio": 4729058.642857143, "sal_prom_mod": 1336262.1666666667, "sal_prom_moi": 4011904.714285714, "pct_nom_prod": 0.057822551091703055, "pct_nom_costo": 0.08498950064184853}, {"Proyecto": "037 EJECUTIVA", "costo_total": 50000000, "Auxilios y Subsidios": 10000000, "Horas Extras": 0, "Licencias/Permisos": 0, "Otros": 0, "Sueldo": 40000000, "Vacaciones": 0, "costo_MOD": 0, "costo_MOI": 50000000, "sueldo_mod": 0.0, "pers_mod": 0, "sueldo_moi": 40000000, "pers_moi": 3, "produccion": 0.0, "costos_contrato": 0.0, "empleados": 3, "tipo": "admin", "sal_promedio": 16666666.666666666, "sal_prom_mod": 0.0, "sal_prom_moi": 13333333.333333334, "pct_nom_prod": null, "pct_nom_costo": null}, {"Proyecto": "0424 ENEL SE EL UVERO", "costo_total": 48057333, "Auxilios y Subsidios": 2057333, "Horas Extras": 0, "Licencias/Permisos": 0, "Otros": 0, "Sueldo": 46000000, "Vacaciones": 0, "costo_MOD": 0, "costo_MOI": 48057333, "sueldo_mod": 0.0, "pers_mod": 0, "sueldo_moi": 46000000, "pers_moi": 3, "produccion": 0.0, "costos_contrato": 0.0, "empleados": 3, "tipo": "productivo", "sal_promedio": 16019111.0, "sal_prom_mod": 0.0, "sal_prom_moi": 15333333.333333334, "pct_nom_prod": null, "pct_nom_costo": null}, {"Proyecto": "0007 PERSONAL DE LA CASA", "costo_total": 42760091, "Auxilios y Subsidios": 6400394, "Horas Extras": 0, "Licencias/Permisos": 133030, "Otros": 0, "Sueldo": 36226667, "Vacaciones": 0, "costo_MOD": 35760091, "costo_MOI": 7000000, "sueldo_mod": 30226667.0, "pers_mod": 10, "sueldo_moi": 6000000, "pers_moi": 1, "produccion": 0.0, "costos_contrato": 0.0, "empleados": 11, "tipo": "admin", "sal_promedio": 3887281.0, "sal_prom_mod": 3022666.7, "sal_prom_moi": 6000000.0, "pct_nom_prod": null, "pct_nom_costo": null}, {"Proyecto": "0438 ENEL SE NUEVA ESTANCIA", "costo_total": 36360778, "Auxilios y Subsidios": 8278047, "Horas Extras": 1792651, "Licencias/Permisos": 6672508, "Otros": 0, "Sueldo": 19617572, "Vacaciones": 0, "costo_MOD": 14014831, "costo_MOI": 22345947, "sueldo_mod": 8384239.0, "pers_mod": 4, "sueldo_moi": 11233333, "pers_moi": 4, "produccion": 0.0, "costos_contrato": 0.0, "empleados": 8, "tipo": "productivo", "sal_promedio": 4545097.25, "sal_prom_mod": 2096059.75, "sal_prom_moi": 2808333.25, "pct_nom_prod": null, "pct_nom_costo": null}, {"Proyecto": "0465 CELSIA SAHAGÚN 500kV", "costo_total": 35795141, "Auxilios y Subsidios": 6276657, "Horas Extras": 101818, "Licencias/Permisos": 0, "Otros": 0, "Sueldo": 29416666, "Vacaciones": 0, "costo_MOD": 0, "costo_MOI": 35795141, "sueldo_mod": 0.0, "pers_mod": 0, "sueldo_moi": 29416666, "pers_moi": 6, "produccion": 0.0, "costos_contrato": 0.0, "empleados": 5, "tipo": "productivo", "sal_promedio": 7159028.2, "sal_prom_mod": 0.0, "sal_prom_moi": 4902777.666666667, "pct_nom_prod": null, "pct_nom_costo": null}, {"Proyecto": "0464 LT PUERTOS DE SANTANDER", "costo_total": 33326674, "Auxilios y Subsidios": 7826674, "Horas Extras": 0, "Licencias/Permisos": 11716667, "Otros": 0, "Sueldo": 13383333, "Vacaciones": 400000, "costo_MOD": 6266674, "costo_MOI": 27060000, "sueldo_mod": 3800000.0, "pers_mod": 2, "sueldo_moi": 9583333, "pers_moi": 1, "produccion": 0.0, "costos_contrato": 0.0, "empleados": 6, "tipo": "productivo", "sal_promedio": 5554445.666666667, "sal_prom_mod": 1900000.0, "sal_prom_moi": 9583333.0, "pct_nom_prod": null, "pct_nom_costo": null}, {"Proyecto": "0461 LT ATLAS CAMPANO", "costo_total": 29814265, "Auxilios y Subsidios": 8355205, "Horas Extras": 199225, "Licencias/Permisos": 0, "Otros": 0, "Sueldo": 21259835, "Vacaciones": 0, "costo_MOD": 13211293, "costo_MOI": 16602972, "sueldo_mod": 9503168.0, "pers_mod": 17, "sueldo_moi": 11756667, "pers_moi": 4, "produccion": 499000000.0, "costos_contrato": 323000000.0, "empleados": 21, "tipo": "productivo", "sal_promedio": 1419726.9047619049, "sal_prom_mod": 559009.8823529412, "sal_prom_moi": 2939166.75, "pct_nom_prod": 0.059748026052104206, "pct_nom_costo": 0.09230422600619195}, {"Proyecto": "0413 GEB LT COLECTORA LA LOMA TRAMO 2", "costo_total": 19304226, "Auxilios y Subsidios": 4130192, "Horas Extras": 447675, "Licencias/Permisos": 0, "Otros": 0, "Sueldo": 14726359, "Vacaciones": 0, "costo_MOD": 9563678, "costo_MOI": 9740548, "sueldo_mod": 7126359.0, "pers_mod": 4, "sueldo_moi": 7600000, "pers_moi": 2, "produccion": 454000000.0, "costos_contrato": 394000000.0, "empleados": 6, "tipo": "productivo", "sal_promedio": 3217371.0, "sal_prom_mod": 1781589.75, "sal_prom_moi": 3800000.0, "pct_nom_prod": 0.04252032158590308, "pct_nom_costo": 0.04899549746192893}, {"Proyecto": "0460 CELSIA CARRETO", "costo_total": 13500000, "Auxilios y Subsidios": 1500000, "Horas Extras": 0, "Licencias/Permisos": 0, "Otros": 0, "Sueldo": 12000000, "Vacaciones": 0, "costo_MOD": 0, "costo_MOI": 13500000, "sueldo_mod": 0.0, "pers_mod": 0, "sueldo_moi": 12000000, "pers_moi": 2, "produccion": 0.0, "costos_contrato": 27000000.0, "empleados": 2, "tipo": "productivo", "sal_promedio": 6750000.0, "sal_prom_mod": 0.0, "sal_prom_moi": 6000000.0, "pct_nom_prod": null, "pct_nom_costo": 0.5}, {"Proyecto": "0437 ENEL BOCHICA", "costo_total": 8800000, "Auxilios y Subsidios": 1251040, "Horas Extras": 0, "Licencias/Permisos": 5948960, "Otros": 0, "Sueldo": 1600000, "Vacaciones": 0, "costo_MOD": 0, "costo_MOI": 8800000, "sueldo_mod": 0.0, "pers_mod": 0, "sueldo_moi": 1600000, "pers_moi": 1, "produccion": 0.0, "costos_contrato": 0.0, "empleados": 1, "tipo": "productivo", "sal_promedio": 8800000.0, "sal_prom_mod": 0.0, "sal_prom_moi": 1600000.0, "pct_nom_prod": null, "pct_nom_costo": null}], "conceptos": [{"categoria": "Auxilios y Subsidios", "concept_descrip": "AUXILIO DE ALIMENTACION DIARIO", "Vlr_Nomina": 1242273141.0}, {"categoria": "Auxilios y Subsidios", "concept_descrip": "AUXILIO DE ALIMENTACION", "Vlr_Nomina": 552826336.0}, {"categoria": "Auxilios y Subsidios", "concept_descrip": "SUBSIDIO DE TRANSPORTE", "Vlr_Nomina": 156988027.0}, {"categoria": "Auxilios y Subsidios", "concept_descrip": "AUXILIO DE DESPLAZAMIENTO", "Vlr_Nomina": 97062000.0}, {"categoria": "Auxilios y Subsidios", "concept_descrip": "AUXILIO DE ALOJAMIENTO", "Vlr_Nomina": 68324666.0}, {"categoria": "Auxilios y Subsidios", "concept_descrip": "AUXILIO RODAMIENTO", "Vlr_Nomina": 41850667.0}, {"categoria": "Auxilios y Subsidios", "concept_descrip": "AUXILIO UNICO PROYECTO", "Vlr_Nomina": 41763059.0}, {"categoria": "Auxilios y Subsidios", "concept_descrip": "BONO", "Vlr_Nomina": 22020775.0}, {"categoria": "Auxilios y Subsidios", "concept_descrip": "AUXILIO EMPRESA DIAS INICIALES INCAPACIDAD", "Vlr_Nomina": 9600480.0}, {"categoria": "Auxilios y Subsidios", "concept_descrip": "BONO DE PRODUCTIVIDAD", "Vlr_Nomina": 6300000.0}, {"categoria": "Auxilios y Subsidios", "concept_descrip": "SUBSIDIO DE TRANSPORTE PERIODO ANTERIOR", "Vlr_Nomina": 3213316.0}, {"categoria": "Auxilios y Subsidios", "concept_descrip": "AUXILIO DE GUARDERIA", "Vlr_Nomina": 1215000.0}, {"categoria": "Auxilios y Subsidios", "concept_descrip": "AUXILIO EMPRESA INCAPACIDAD", "Vlr_Nomina": 1062366.0}, {"categoria": "Auxilios y Subsidios", "concept_descrip": "AUXILIO DIAS INICIALES INCAPACIDAD  AMBUL ADMIN 100%", "Vlr_Nomina": 983160.0}, {"categoria": "Horas Extras", "concept_descrip": "HORA EXTRA DIURNA ORDINARIA 1.25%", "Vlr_Nomina": 450475720.0}, {"categoria": "Horas Extras", "concept_descrip": "DOMINICAL O FESTIVO AL 180% LEY 2466", "Vlr_Nomina": 264148758.0}, {"categoria": "Horas Extras", "concept_descrip": "HORA RECARGO NOCTURNO DOMINICAL O FESTIVO 2.10%", "Vlr_Nomina": 40277709.0}, {"categoria": "Horas Extras", "concept_descrip": "DOMINICAL AL 80% LEY 2466", "Vlr_Nomina": 39587215.0}, {"categoria": "Horas Extras", "concept_descrip": "HORA RECARGO NOCTURNO NORMAL 0.35%", "Vlr_Nomina": 33268019.0}, {"categoria": "Horas Extras", "concept_descrip": "HORA EXTRA NOCTURNA ORDINARIA 1.75%", "Vlr_Nomina": 32088948.0}, {"categoria": "Horas Extras", "concept_descrip": "HORA EXTRA DIURNA DOMINICAL O FESTIVO 2.00%", "Vlr_Nomina": 16059291.0}, {"categoria": "Horas Extras", "concept_descrip": "HORA EXTRA NOCTURNA DOMINICAL O FESTIVO 2.50%", "Vlr_Nomina": 9838435.0}, {"categoria": "Horas Extras", "concept_descrip": "HORA COMPENSATORIA 100%", "Vlr_Nomina": 4666038.0}, {"categoria": "Horas Extras", "concept_descrip": "AJUSTE HORAS EXTRAS", "Vlr_Nomina": -13911.0}, {"categoria": "Licencias/Permisos", "concept_descrip": "PERMISO POR DESCANSO", "Vlr_Nomina": 320744680.0}, {"categoria": "Licencias/Permisos", "concept_descrip": "INCAPACIDAD GENERAL AMBULATORIA", "Vlr_Nomina": 24182755.0}, {"categoria": "Licencias/Permisos", "concept_descrip": "PRORROGA INCAPACIDAD GENERAL AMBULATORIA", "Vlr_Nomina": 22568369.0}, {"categoria": "Licencias/Permisos", "concept_descrip": "LICENCIA DE MATERNIDAD", "Vlr_Nomina": 17786443.0}, {"categoria": "Licencias/Permisos", "concept_descrip": "LICENCIA DE PATERNIDAD O LEY MARIA", "Vlr_Nomina": 17061652.0}, {"categoria": "Licencias/Permisos", "concept_descrip": "PRORROGA INCAPACIDAD ACCIDENTE DE TRABAJO", "Vlr_Nomina": 15955598.0}, {"categoria": "Licencias/Permisos", "concept_descrip": "INCAPACIDAD ACCIDENTE DE TRABAJO", "Vlr_Nomina": 5910631.0}, {"categoria": "Licencias/Permisos", "concept_descrip": "LICENCIA REMUNERADA POR LUTO", "Vlr_Nomina": 3683939.0}, {"categoria": "Licencias/Permisos", "concept_descrip": "AJUSTE INCAPACIDAD", "Vlr_Nomina": 1152107.0}, {"categoria": "Licencias/Permisos", "concept_descrip": "PERMISO REMUNERADO", "Vlr_Nomina": 833333.0}, {"categoria": "Licencias/Permisos", "concept_descrip": "LICENCIA REMUNERADA", "Vlr_Nomina": 460062.0}, {"categoria": "Licencias/Permisos", "concept_descrip": "PERMISO NO REMUNERADO POR HORAS", "Vlr_Nomina": -55710.0}, {"categoria": "Otros", "concept_descrip": "REINTEGRO", "Vlr_Nomina": 17509.0}, {"categoria": "Sueldo", "concept_descrip": "SUELDO BASICO", "Vlr_Nomina": 5838096288.0}, {"categoria": "Sueldo", "concept_descrip": "SUELDO PERIODO ANTERIOR BASICO", "Vlr_Nomina": 20669010.0}, {"categoria": "Sueldo", "concept_descrip": "RETROACTIVO SUELDO BASICO", "Vlr_Nomina": 1896376.0}, {"categoria": "Sueldo", "concept_descrip": "AJUSTE DE SUELDO BASICO", "Vlr_Nomina": 1163333.0}, {"categoria": "Vacaciones", "concept_descrip": "VACACIONES DISFRUTADAS", "Vlr_Nomina": 39541883.0}, {"categoria": "Vacaciones", "concept_descrip": "VACACIONES EN DINERO", "Vlr_Nomina": 28602539.0}]};
+
+// ══════════════════════════════════════
+// GLOBALS & HELPERS
+// ══════════════════════════════════════
+const G=DATA.globals, PROJ=DATA.proyectos, CONC=DATA.conceptos;
+const ADMIN=['0001 OFICINA PRINCIPAL','037 EJECUTIVA','0007 PERSONAL DE LA CASA'];
+const CAT_COLS=['#1a56db','#059669','#dc2626','#d97706','#0891b2','#94a3b8'];
+const CAT_MAP={'Sueldo':'#1a56db','Auxilios y Subsidios':'#059669','Horas Extras':'#dc2626','Licencias/Permisos':'#d97706','Vacaciones':'#0891b2','Otros':'#94a3b8'};
+const CATS=['Sueldo','Auxilios y Subsidios','Horas Extras','Licencias/Permisos','Vacaciones'];
+
+const fmtM=v=>{if(v==null)return'—';return'$'+(v/1e6).toLocaleString('es-CO',{minimumFractionDigits:1,maximumFractionDigits:1})+' M';};
+const fmtN=v=>v==null?'—':new Intl.NumberFormat('es-CO').format(Math.round(v));
+const fmtP=v=>v==null?'—':(v*100).toFixed(1)+'%';
+const semCls=p=>p>0.35?'pct-red':p>0.20?'pct-amber':'pct-green';
+const semCol=p=>p>0.35?'#dc2626':p>0.20?'#d97706':'#059669';
+
+Chart.defaults.font.family="'DM Sans',sans-serif";
+Chart.defaults.font.size=11;
+Chart.defaults.color='#64748b';
+Chart.defaults.plugins.legend.labels.boxWidth=11;
+Chart.defaults.plugins.legend.labels.padding=11;
+
+// ── FILTER STATE ──
+const filterState={costos:new Set(),prod:new Set(),modmoi:new Set(),extras:new Set(),comp:new Set()};
+const chartInstances={};
+
+function filteredProj(key){
+  const s=filterState[key];
+  return s.size===0?PROJ:PROJ.filter(p=>s.has(p.Proyecto));
+}
+
+function addFilter(key,sel){
+  const val=sel.value; if(!val)return;
+  filterState[key].add(val);
+  sel.value='';
+  renderTags(key);
+  applyFilter(key);
+}
+function removeFilter(key,val){
+  filterState[key].delete(val);
+  renderTags(key);
+  applyFilter(key);
+}
+function clearFilter(key){
+  filterState[key].clear();
+  renderTags(key);
+  applyFilter(key);
+}
+function renderTags(key){
+  const el=document.getElementById('ft-'+key);
+  if(!el)return;
+  el.innerHTML=[...filterState[key]].map(v=>`<span class="filter-tag" onclick="removeFilter('${key}','${v.replace(/'/g,"\\'")}')"><span>${v.length>28?v.substring(0,28)+'…':v}</span><span class="remove">×</span></span>`).join('');
+}
+function applyFilter(key){
+  const fn={costos:refreshCostos,prod:refreshProd,modmoi:refreshModMoi,extras:refreshExtras,comp:refreshComp};
+  if(fn[key])fn[key]();
+}
+
+function populateSelects(){
+  const ids=['fs-costos','fs-prod','fs-modmoi','fs-extras','fs-comp'];
+  ids.forEach(id=>{
+    const sel=document.getElementById(id); if(!sel)return;
+    PROJ.forEach(p=>{
+      const opt=document.createElement('option');
+      opt.value=p.Proyecto;
+      opt.textContent=p.Proyecto;
+      sel.appendChild(opt);
+    });
+  });
+}
+
+function destroyChart(id){
+  if(chartInstances[id]){chartInstances[id].destroy();delete chartInstances[id];}
+}
+function mkChart(id,cfg){
+  destroyChart(id);
+  chartInstances[id]=new Chart(document.getElementById(id),cfg);
+  return chartInstances[id];
+}
+
+// ══════════════════════════════════════
+// TAB
+// ══════════════════════════════════════
+function showTab(id,btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ══════════════════════════════════════
+// RESUMEN
+// ══════════════════════════════════════
+function mkKpi(l,v,s,c,wide){
+  return `<div class="kpi-card${wide?' kpi-wide':''}" style="--kc:${c}">
+    <div class="kpi-label">${l}</div>
+    <div class="kpi-value">${v}</div>
+    ${s?`<div class="kpi-sub">${s}</div>`:''}
+  </div>`;
+}
+
+function renderResumen(){
+
+  // ── BLOQUE 1: Contexto del mes (5 tarjetas) ──
+  // Producción Total | Costos Contratos | Proyectos activos | Costo Nómina (wide, con nota) | Empleados
+  document.getElementById('kpi-r1').innerHTML=
+    mkKpi('PRODUCCIÓN TOTAL',fmtM(G.total_prod),'','#059669')+
+    mkKpi('COSTOS TOTALES',fmtM(G.total_costos_contrato),'','#0891b2')+
+    mkKpi('PROYECTOS ACTIVOS',G.n_prod,'Con producción en el mes','#1a56db')+
+    mkKpi('COSTO TOTAL NÓMINA',fmtM(G.total_costo),'⚠ Sin factor prestacional','#0d1f3c')+
+    mkKpi('EMPLEADOS ÚNICOS','1.966','','#1a56db');
+
+  // ── BLOQUE 2: Mano de Obra (6 tarjetas — 3 MOD + 3 MOI) ──
+  document.getElementById('kpi-r2').innerHTML=
+    // MOD — fondo azul tenue
+    `<div class="kpi-card kpi-group-left" style="--kc:#1a56db;background:rgba(26,86,219,.05);border-color:rgba(26,86,219,.2)">
+      <div class="kpi-label" style="color:#1a56db">M.O. DIRECTA — COSTO</div>
+      <div class="kpi-value">${fmtM(G.total_mod)}</div>
+      <div class="kpi-sub">${fmtP(G.total_mod/G.total_costo)} del total nómina</div>
+    </div>
+    <div class="kpi-card kpi-group-mid" style="--kc:#1a56db;background:rgba(26,86,219,.05);border-color:rgba(26,86,219,.2)">
+      <div class="kpi-label" style="color:#1a56db">PERSONAS MOD</div>
+      <div class="kpi-value">${fmtN(G.pers_mod_global)}</div>
+      <div class="kpi-sub">Según sueldo básico</div>
+    </div>
+    <div class="kpi-card kpi-group-right" style="--kc:#1a56db;background:rgba(26,86,219,.05);border-color:rgba(26,86,219,.2)">
+      <div class="kpi-label" style="color:#1a56db">SAL. PROM. MOD</div>
+      <div class="kpi-value">${fmtM(G.sal_prom_mod_global)}</div>
+      <div class="kpi-sub">Sueldo básico / persona</div>
+    </div>` +
+    // MOI — fondo cyan tenue
+    `<div class="kpi-card kpi-group-left" style="--kc:#0891b2;background:rgba(8,145,178,.05);border-color:rgba(8,145,178,.2)">
+      <div class="kpi-label" style="color:#0891b2">M.O. INDIRECTA — COSTO</div>
+      <div class="kpi-value">${fmtM(G.total_moi)}</div>
+      <div class="kpi-sub">${fmtP(G.total_moi/G.total_costo)} del total nómina</div>
+    </div>
+    <div class="kpi-card kpi-group-mid" style="--kc:#0891b2;background:rgba(8,145,178,.05);border-color:rgba(8,145,178,.2)">
+      <div class="kpi-label" style="color:#0891b2">PERSONAS MOI</div>
+      <div class="kpi-value">${fmtN(G.pers_moi_global)}</div>
+      <div class="kpi-sub">Según sueldo básico</div>
+    </div>
+    <div class="kpi-card kpi-group-right" style="--kc:#0891b2;background:rgba(8,145,178,.05);border-color:rgba(8,145,178,.2)">
+      <div class="kpi-label" style="color:#0891b2">SAL. PROM. MOI</div>
+      <div class="kpi-value">${fmtM(G.sal_prom_moi_global)}</div>
+      <div class="kpi-sub">Sueldo básico / persona</div>
+    </div>`;
+
+  // ── BLOQUE 3: Composición nómina (7 tarjetas con mini barra visual) ──
+  const compItems=[
+    {l:'SUELDO BÁSICO',    v:G.total_sueldo, c:'#0d1f3c'},
+    {l:'AUXILIOS Y SUBS.', v:G.total_aux,    c:'#059669'},
+    {l:'HORAS EXTRAS',     v:G.total_extras, c:'#dc2626'},
+    {l:'LICENCIAS',        v:G.total_lic,    c:'#d97706'},
+    {l:'VACACIONES',       v:G.total_vac,    c:'#0891b2'},
+  ];
+  const maxComp=Math.max(...compItems.map(i=>i.v));
+  document.getElementById('kpi-r3').innerHTML=compItems.map(k=>`
+    <div class="kpi-card" style="--kc:${k.c}">
+      <div class="kpi-label">${k.l}</div>
+      <div class="kpi-value" style="font-size:16px">${fmtM(k.v)}</div>
+      <div style="margin:6px 0 2px;height:4px;background:var(--light);border-radius:4px;overflow:hidden">
+        <div style="height:100%;width:${(k.v/maxComp*100).toFixed(1)}%;background:${k.c};border-radius:4px;transition:width .5s"></div>
+      </div>
+      <div class="kpi-sub">${fmtP(k.v/G.total_costo)}</div>
+    </div>`).join('');
+
+  // ── GRÁFICAS ──
+  mkChart('ch-res-comp',{type:'doughnut',data:{
+    labels:CATS,
+    datasets:[{data:[G.total_sueldo,G.total_aux,G.total_extras,G.total_lic,G.total_vac],backgroundColor:CAT_COLS,borderWidth:3,borderColor:'#fff',hoverOffset:7}]
+  },options:{cutout:'62%',responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:8,boxWidth:10}},tooltip:{callbacks:{label:ctx=>` ${ctx.label}: ${fmtM(ctx.raw)} (${(ctx.raw/G.total_costo*100).toFixed(1)}%)`}}}}});
+
+  mkChart('ch-res-modmoi',{type:'doughnut',data:{
+    labels:['M.O. Directa','M.O. Indirecta'],
+    datasets:[{data:[G.total_mod,G.total_moi],backgroundColor:['#1a56db','#0891b2'],borderWidth:3,borderColor:'#fff',hoverOffset:7}]
+  },options:{cutout:'62%',responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:8,boxWidth:10}},tooltip:{callbacks:{label:ctx=>` ${ctx.label}: ${fmtM(ctx.raw)} (${(ctx.raw/(G.total_mod+G.total_moi)*100).toFixed(1)}%)`}}}}});
+
+  // ── BARRAS ──
+  const top15=PROJ.slice(0,15),mx=top15[0].costo_total;
+  document.getElementById('bars-resumen').innerHTML=top15.map(p=>`
+    <div class="bar-row" style="margin-bottom:5px">
+      <div class="bar-label" title="${p.Proyecto}" style="width:175px;font-size:10.5px">${p.Proyecto}</div>
+      <div class="bar-track" style="height:8px"><div class="bar-fill" style="width:${p.costo_total/mx*100}%;background:${ADMIN.includes(p.Proyecto)?'#ea580c':'#1a56db'}"></div></div>
+      <div class="bar-val" style="font-size:10.5px;width:70px">${fmtM(p.costo_total)}</div>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════
+// COSTOS
+// ══════════════════════════════════════
+function refreshCostos(){
+  const fp=filteredProj('costos');
+  const top20=fp.slice(0,20);
+
+  destroyChart('ch-costo-bar');
+  mkChart('ch-costo-bar',{type:'bar',data:{
+    labels:top20.map(p=>p.Proyecto.length>28?p.Proyecto.substring(0,28)+'…':p.Proyecto),
+    datasets:[{data:top20.map(p=>p.costo_total/1e6),backgroundColor:top20.map(p=>ADMIN.includes(p.Proyecto)?'rgba(234,88,12,.8)':'rgba(26,86,219,.8)'),borderRadius:4,borderSkipped:false}]
+  },options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`$${ctx.raw.toFixed(1)} M`}}},scales:{x:{grid:{color:'rgba(0,0,0,.05)'},ticks:{callback:v=>`$${v} M`}},y:{grid:{display:false},ticks:{font:{size:10}}}}}});
+
+  const top12=fp.slice(0,12),cl=['#1a56db','#dc2626','#059669','#0891b2','#d97706'],lb=['Sueldo','H.Extras','Auxilios','Vacaciones','Licencias'];
+  destroyChart('ch-stacked');
+  mkChart('ch-stacked',{type:'bar',data:{
+    labels:top12.map(p=>p.Proyecto.length>26?p.Proyecto.substring(0,26)+'…':p.Proyecto),
+    datasets:CATS.map((c,i)=>({label:lb[i],data:top12.map(p=>(p[c]||0)/1e6),backgroundColor:cl[i],borderRadius:i===4?4:0,borderSkipped:false}))
+  },options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},tooltip:{mode:'index',callbacks:{label:ctx=>`${ctx.dataset.label}: $${ctx.raw.toFixed(1)} M`}}},scales:{x:{stacked:true,ticks:{callback:v=>`$${v} M`},grid:{color:'rgba(0,0,0,.05)'}},y:{stacked:true,grid:{display:false},ticks:{font:{size:10}}}}}});
+
+  // Table
+  const tot=G.total_costo;
+  let html='';
+  fp.forEach(p=>{
+    const vl=(p['Vacaciones']||0)+(p['Licencias/Permisos']||0),isA=ADMIN.includes(p.Proyecto);
+    html+=`<tr class="${isA?'admin-row':''}"><td class="bold">${p.Proyecto}</td><td class="num">${fmtN(p.empleados)}</td><td class="num bold">${fmtM(p.costo_total)}</td><td class="num">${fmtM(p['Sueldo']||0)}</td><td class="num">${fmtM(p['Horas Extras']||0)}</td><td class="num">${fmtM(p['Auxilios y Subsidios']||0)}</td><td class="num">${fmtM(vl)}</td><td class="num">${(p.costo_total/tot*100).toFixed(1)}%</td><td><span class="badge ${isA?'badge-admin':'badge-prod'}">${isA?'Admin':'Prod.'}</span></td></tr>`;
+  });
+  // Total row - always 1966 unique employees
+  const ts=fp.reduce((a,p)=>a+(p['Sueldo']||0),0),te=fp.reduce((a,p)=>a+(p['Horas Extras']||0),0),ta=fp.reduce((a,p)=>a+(p['Auxilios y Subsidios']||0),0),tvl=fp.reduce((a,p)=>a+(p['Vacaciones']||0)+(p['Licencias/Permisos']||0),0),tc=fp.reduce((a,p)=>a+p.costo_total,0);
+  const empTotal=filterState['costos'].size===0?'1.966':fmtN(fp.reduce((a,p)=>a+p.empleados,0));
+  html+=`<tr class="total-row"><td class="bold">TOTAL</td><td class="num bold">${empTotal}</td><td class="num bold">${fmtM(tc)}</td><td class="num bold">${fmtM(ts)}</td><td class="num bold">${fmtM(te)}</td><td class="num bold">${fmtM(ta)}</td><td class="num bold">${fmtM(tvl)}</td><td class="num bold">${(tc/tot*100).toFixed(1)}%</td><td></td></tr>`;
+  document.getElementById('tbody-costos').innerHTML=html;
+}
+
+// ══════════════════════════════════════
+// PRODUCCION
+// ══════════════════════════════════════
+function refreshProd(){
+  const fp=filteredProj('prod');
+  const sorted=[...fp].filter(p=>p.pct_nom_prod!=null).sort((a,b)=>b.pct_nom_prod-a.pct_nom_prod).slice(0,18);
+
+  destroyChart('ch-pct-prod');
+  mkChart('ch-pct-prod',{type:'bar',data:{
+    labels:sorted.map(p=>p.Proyecto.length>32?p.Proyecto.substring(0,32)+'…':p.Proyecto),
+    datasets:[{data:sorted.map(p=>p.pct_nom_prod*100),backgroundColor:sorted.map(p=>semCol(p.pct_nom_prod)),borderRadius:4}]
+  },options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.raw.toFixed(1)}%`}}},scales:{x:{grid:{color:'rgba(0,0,0,.05)'},ticks:{callback:v=>`${v}%`},max:sorted.length?Math.ceil(sorted[0].pct_nom_prod*100*1.18):100},y:{grid:{display:false},ticks:{font:{size:10}}}}}});
+
+  let html='';
+  fp.forEach(p=>{
+    const pnp=p.pct_nom_prod,pnc=p.pct_nom_costo;
+    html+=`<tr>
+      <td class="bold">${p.Proyecto}</td><td class="num">${fmtN(p.empleados)}</td>
+      <td class="num">${p.produccion>0?fmtM(p.produccion):'—'}</td>
+      <td class="num ${pnp!=null?semCls(pnp):''}">${pnp!=null?(pnp*100).toFixed(1)+'%':'S/P'}</td>
+      <td class="num">${p.costos_contrato>0?fmtM(p.costos_contrato):'—'}</td>
+      <td class="num ${pnc!=null?semCls(pnc):''}">${pnc!=null?(pnc*100).toFixed(1)+'%':'S/P'}</td>
+      <td class="num bold">${fmtM(p.costo_total)}</td>
+    </tr>`;
+  });
+  const tp=fp.reduce((a,p)=>a+p.produccion,0),tc2=fp.filter(p=>p.costos_contrato>0).reduce((a,p)=>a+p.costos_contrato,0),tn=fp.reduce((a,p)=>a+p.costo_total,0);
+  const empProd=filterState['prod'].size===0?'1.966':fmtN(fp.reduce((a,p)=>a+p.empleados,0));
+  html+=`<tr class="total-row"><td class="bold">TOTAL</td><td class="num bold">${empProd}</td>
+    <td class="num bold">${fmtM(tp)}</td><td class="num bold ${tp>0?semCls(tn/tp):''}">${tp>0?(tn/tp*100).toFixed(1)+'%':'—'}</td>
+    <td class="num bold">${fmtM(tc2)}</td><td class="num bold ${tc2>0?semCls(tn/tc2):''}">${tc2>0?(tn/tc2*100).toFixed(1)+'%':'—'}</td>
+    <td class="num bold">${fmtM(tn)}</td></tr>`;
+  document.getElementById('tbody-prod').innerHTML=html;
+}
+
+// ══════════════════════════════════════
+// MOD / MOI
+// ══════════════════════════════════════
+function refreshModMoi(){
+  const fp=filteredProj('modmoi');
+  const tMOD=fp.reduce((a,p)=>a+p.costo_MOD,0),tMOI=fp.reduce((a,p)=>a+p.costo_MOI,0);
+  const sMOD=fp.reduce((a,p)=>a+p.sueldo_mod,0),pMOD=fp.reduce((a,p)=>a+p.pers_mod,0);
+  const sMOI=fp.reduce((a,p)=>a+p.sueldo_moi,0),pMOI=fp.reduce((a,p)=>a+p.pers_moi,0);
+
+  document.getElementById('kpi-modmoi').innerHTML=[
+    {l:'COSTO MOD',v:fmtM(tMOD),s:fmtP(tMOD/(tMOD+tMOI))+' del total',c:'#1a56db'},
+    {l:'PERSONAS MOD',v:fmtN(pMOD),s:'Sobre sueldo básico',c:'#1a56db'},
+    {l:'SAL. PROM. MOD',v:pMOD>0?fmtM(sMOD/pMOD):'—',s:'Sueldo básico / persona',c:'#1a56db'},
+    {l:'COSTO MOI',v:fmtM(tMOI),s:fmtP(tMOI/(tMOD+tMOI))+' del total',c:'#0891b2'},
+    {l:'PERSONAS MOI',v:fmtN(pMOI),s:'Sobre sueldo básico',c:'#0891b2'},
+    {l:'SAL. PROM. MOI',v:pMOI>0?fmtM(sMOI/pMOI):'—',s:'Sueldo básico / persona',c:'#0891b2'},
+  ].map(k=>`<div class="kpi-card" style="--kc:${k.c}"><div class="kpi-label">${k.l}</div><div class="kpi-value">${k.v}</div><div class="kpi-sub">${k.s}</div></div>`).join('');
+
+  destroyChart('ch-mod-donut');
+  mkChart('ch-mod-donut',{type:'doughnut',data:{
+    labels:['M.O. Directa','M.O. Indirecta'],
+    datasets:[{data:[tMOD,tMOI],backgroundColor:['#1a56db','#0891b2'],borderWidth:3,borderColor:'#fff',hoverOffset:7}]
+  },options:{cutout:'58%',responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'},tooltip:{callbacks:{label:ctx=>` ${ctx.label}: ${fmtM(ctx.raw)} (${(ctx.raw/(tMOD+tMOI)*100).toFixed(1)}%)`}}}}});
+
+  const top12=fp.slice(0,12);
+  destroyChart('ch-mod-stacked');
+  mkChart('ch-mod-stacked',{type:'bar',data:{
+    labels:top12.map(p=>p.Proyecto.length>24?p.Proyecto.substring(0,24)+'…':p.Proyecto),
+    datasets:[{label:'MOD',data:top12.map(p=>p.costo_MOD/1e6),backgroundColor:'#1a56db',borderRadius:2},{label:'MOI',data:top12.map(p=>p.costo_MOI/1e6),backgroundColor:'#0891b2',borderRadius:2}]
+  },options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},tooltip:{mode:'index',callbacks:{label:ctx=>`${ctx.dataset.label}: $${ctx.raw.toFixed(1)} M`}}},scales:{x:{stacked:true,ticks:{callback:v=>`$${v} M`},grid:{color:'rgba(0,0,0,.05)'}},y:{stacked:true,grid:{display:false},ticks:{font:{size:10}}}}}});
+
+  let html='';
+  fp.forEach(p=>{
+    const tot=Math.max(p.costo_MOD+p.costo_MOI,1),isA=ADMIN.includes(p.Proyecto);
+    html+=`<tr class="${isA?'admin-row':''}">
+      <td class="bold">${p.Proyecto}</td><td class="num">${fmtN(p.empleados)}</td>
+      <td class="num">${fmtM(p.costo_MOD)}</td><td class="num">${fmtN(p.pers_mod)}</td>
+      <td class="num bold">${p.sal_prom_mod>0?fmtM(p.sal_prom_mod):'—'}</td>
+      <td class="num">${(p.costo_MOD/tot*100).toFixed(0)}%</td>
+      <td class="num">${fmtM(p.costo_MOI)}</td><td class="num">${fmtN(p.pers_moi)}</td>
+      <td class="num bold">${p.sal_prom_moi>0?fmtM(p.sal_prom_moi):'—'}</td>
+      <td class="num">${(p.costo_MOI/tot*100).toFixed(0)}%</td>
+    </tr>`;
+  });
+  document.getElementById('tbody-modmoi').innerHTML=html;
+}
+
+// ══════════════════════════════════════
+// HORAS EXTRAS
+// ══════════════════════════════════════
+function refreshExtras(){
+  const fp=filteredProj('extras');
+  const extP=fp.filter(p=>p['Horas Extras']>0).sort((a,b)=>b['Horas Extras']-a['Horas Extras']);
+  const top10=extP.slice(0,10);
+  const totExt=extP.reduce((a,p)=>a+p['Horas Extras'],0);
+  const totNom=fp.reduce((a,p)=>a+p.costo_total,0);
+  const projMax=extP[0]||{Proyecto:'—','Horas Extras':0,costo_total:1};
+  const pctMax=extP.length?extP.reduce((a,p)=>(p['Horas Extras']/p.costo_total>a['Horas Extras']/a.costo_total)?p:a):projMax;
+
+  document.getElementById('kpi-extras').innerHTML=[
+    {l:'TOTAL H. EXTRAS + RECARGOS',v:fmtM(totExt),s:fmtP(totNom>0?totExt/totNom:0)+' del costo nómina',c:'#dc2626'},
+    {l:'PROYECTOS CON H. EXTRAS',v:extP.length,s:'de los proyectos filtrados',c:'#d97706'},
+    {l:'MAYOR MONTO',v:projMax.Proyecto.split(' ').slice(0,3).join(' '),s:fmtM(projMax['Horas Extras']),c:'#ea580c'},
+    {l:'MAYOR % S/ NÓMINA',v:extP.length?(pctMax['Horas Extras']/pctMax.costo_total*100).toFixed(1)+'%':'—',s:extP.length?pctMax.Proyecto.split(' ').slice(0,3).join(' '):'',c:'#dc2626'},
+  ].map(k=>`<div class="kpi-card" style="--kc:${k.c}"><div class="kpi-label">${k.l}</div><div class="kpi-value">${k.v}</div><div class="kpi-sub">${k.s}</div></div>`).join('');
+
+  destroyChart('ch-ext-bar');
+  mkChart('ch-ext-bar',{type:'bar',data:{
+    labels:top10.map(p=>p.Proyecto.length>30?p.Proyecto.substring(0,30)+'…':p.Proyecto),
+    datasets:[{data:top10.map(p=>p['Horas Extras']/1e6),backgroundColor:top10.map(p=>{const pct=p['Horas Extras']/p.costo_total;return pct>0.28?'#dc2626':pct>0.18?'#d97706':'#ea580c';}),borderRadius:4}]
+  },options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`$${ctx.raw.toFixed(1)} M`}}},scales:{x:{ticks:{callback:v=>`$${v} M`},grid:{color:'rgba(0,0,0,.05)'}},y:{grid:{display:false},ticks:{font:{size:10}}}}}});
+
+  // Pie tipos - always global
+  const tipos={},nm={'HORA EXTRA DIURNA ORDINARIA 1.25%':'H.E. Diurna 1.25%','DOMINICAL O FESTIVO AL 180% LEY 2466':'Dom./Festivo 180%','HORA RECARGO NOCTURNO DOMINICAL O FESTIVO 2.10%':'Rec.Noct.Dom 2.10%','DOMINICAL AL 80% LEY 2466':'Dominical 80%','HORA RECARGO NOCTURNO NORMAL 0.35%':'Rec.Noct. Normal','HORA EXTRA NOCTURNA ORDINARIA 1.75%':'H.E. Noct. 1.75%','HORA EXTRA DIURNA DOMINICAL O FESTIVO 2.00%':'H.E. Diurna Dom 2%','HORA EXTRA NOCTURNA DOMINICAL O FESTIVO 2.50%':'H.E. Noct. Dom 2.5%','HORA COMPENSATORIA 100%':'Compensatoria 100%'};
+  CONC.filter(c=>c.categoria==='Horas Extras'&&c.Vlr_Nomina>0).forEach(c=>{const k=nm[c.concept_descrip]||c.concept_descrip;tipos[k]=(tipos[k]||0)+c.Vlr_Nomina;});
+  const extL=Object.keys(tipos),extV=Object.values(tipos),extC=['#dc2626','#ea580c','#f97316','#fbbf24','#a3e635','#34d399','#22d3ee','#818cf8','#e879f9'];
+  destroyChart('ch-ext-tipo');
+  mkChart('ch-ext-tipo',{type:'doughnut',data:{labels:extL,datasets:[{data:extV.map(v=>v/1e6),backgroundColor:extC.slice(0,extL.length),borderWidth:3,borderColor:'#fff',hoverOffset:7}]},options:{cutout:'50%',responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{padding:8,font:{size:10}}},tooltip:{callbacks:{label:ctx=>`${ctx.label}: $${ctx.raw.toFixed(1)} M`}}}}});
+
+  let html='';
+  extP.forEach(p=>{const pct=p['Horas Extras']/p.costo_total;html+=`<tr><td class="bold">${p.Proyecto}</td><td class="num">${fmtN(p.empleados)}</td><td class="num">${fmtM(p.costo_total)}</td><td class="num bold">${fmtM(p['Horas Extras'])}</td><td class="num ${semCls(pct)}">${(pct*100).toFixed(1)}%</td></tr>`;});
+  html+=`<tr class="total-row"><td class="bold">TOTAL</td><td class="num bold">${fmtN(extP.reduce((a,p)=>a+p.empleados,0))}</td><td class="num bold">—</td><td class="num bold">${fmtM(totExt)}</td><td class="num bold">${totNom>0?(totExt/totNom*100).toFixed(1)+'%':'—'}</td></tr>`;
+  document.getElementById('tbody-extras').innerHTML=html;
+}
+
+// ══════════════════════════════════════
+// COMPOSICION
+// ══════════════════════════════════════
+function refreshComp(){
+  const fp=filteredProj('comp');
+  const totCosto=fp.reduce((a,p)=>a+p.costo_total,0);
+  const catTotals=CATS.map(c=>fp.reduce((a,p)=>a+(p[c]||0),0));
+
+  destroyChart('ch-cat-pie');
+  mkChart('ch-cat-pie',{type:'doughnut',data:{
+    labels:CATS,
+    datasets:[{data:catTotals,backgroundColor:CAT_COLS,borderWidth:3,borderColor:'#fff',hoverOffset:7}]
+  },options:{cutout:'55%',responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{padding:10}},tooltip:{callbacks:{label:ctx=>` ${ctx.label}: ${fmtM(ctx.raw)} (${(ctx.raw/totCosto*100).toFixed(1)}%)`}}}}});
+
+  const maxCat=Math.max(...catTotals);
+  document.getElementById('cat-summary').innerHTML=CATS.map((c,i)=>`
+    <div class="bar-row" style="margin-bottom:9px">
+      <div class="bar-label" style="font-weight:600;color:var(--navy);width:145px">${c}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${maxCat>0?catTotals[i]/maxCat*100:0}%;background:${CAT_COLS[i]}"></div></div>
+      <div class="bar-val">${fmtM(catTotals[i])}</div>
+    </div>
+    <div style="font-size:10px;color:var(--muted);margin:-5px 0 7px 145px">${totCosto>0?(catTotals[i]/totCosto*100).toFixed(1):'0.0'}% del ${filterState['comp'].size===0?'total':'selección'}</div>`).join('');
+
+  // Concept grid
+  const isFiltered=filterState['comp'].size>0;
+  if(!isFiltered){
+    const groups={};
+    CONC.forEach(c=>{if(!groups[c.categoria])groups[c.categoria]=[];groups[c.categoria].push(c);});
+    document.getElementById('concept-grid').innerHTML=Object.entries(groups).map(([cat,items])=>{
+      const ct=items.reduce((a,i)=>a+i.Vlr_Nomina,0);
+      return `<div class="concept-group"><div class="concept-header" style="background:${CAT_MAP[cat]||'#0d1f3c'}">${cat} — ${fmtM(ct)}</div>${items.filter(i=>i.Vlr_Nomina>0).map(i=>`<div class="concept-row"><span class="concept-name">${i.concept_descrip}</span><span class="concept-val">${fmtM(i.Vlr_Nomina)}</span><span class="concept-pct">${(i.Vlr_Nomina/ct*100).toFixed(1)}%</span></div>`).join('')}</div>`;
+    }).join('');
+  } else {
+    // Show per-project category breakdown
+    document.getElementById('concept-grid').innerHTML=`<div class="concept-group" style="grid-column:1/-1">
+      <div class="concept-header" style="background:var(--navy)">${fp.length===1?fp[0].Proyecto:'Selección ('+fp.length+' proyectos)'} — ${fmtM(totCosto)}</div>
+      ${CATS.filter(c=>fp.reduce((a,p)=>a+(p[c]||0),0)>0).map(c=>{const v=fp.reduce((a,p)=>a+(p[c]||0),0);return `<div class="concept-row"><span class="concept-name" style="font-weight:600">${c}</span><span class="concept-val">${fmtM(v)}</span><span class="concept-pct">${(v/totCosto*100).toFixed(1)}%</span></div>`;}).join('')}
+      <div class="concept-row" style="background:#eef2ff"><span class="concept-name bold">TOTAL</span><span class="concept-val">${fmtM(totCosto)}</span><span class="concept-pct">100%</span></div>
+    </div>`;
+  }
+}
+
+// ══════════════════════════════════════
+// INIT
+// ══════════════════════════════════════
+document.addEventListener('DOMContentLoaded',()=>{
+  populateSelects();
+  renderResumen();
+  refreshCostos();
+  refreshProd();
+  refreshModMoi();
+  refreshExtras();
+  refreshComp();
+});
+</script>
+</body>
+</html>
